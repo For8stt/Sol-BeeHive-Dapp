@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as React from "react";
-import { ReactNode, Suspense, useEffect, useRef } from "react";
+import { ReactNode, Suspense, useEffect, useRef, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import Image from "next/image";
 
@@ -26,29 +26,52 @@ export function UiLayout({
 }) {
   const pathname = usePathname();
   const year = new Date().getFullYear();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    // Collapse the mobile menu after navigation to avoid stale state when switching pages.
+    setIsMenuOpen(false);
+  }, [pathname]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#0D0000] via-[#1A0004] to-[#2A0008] text-rose-50">
-      <div className="navbar backdrop-blur border-b border-[#E23A1E]/30 bg-gradient-to-r from-[#0D0000]/95 via-[#1A0004]/90 to-[#2A0008]/95 text-rose-50 flex-col md:flex-row space-y-2 md:space-y-0 px-4 shadow-[0_20px_45px_rgba(0,0,0,0.65)]">
-        <div className="flex-1">
+      <div className="navbar backdrop-blur border-b border-[#E23A1E]/30 bg-gradient-to-r from-[#0D0000]/95 via-[#1A0004]/90 to-[#2A0008]/95 text-rose-50 flex flex-col gap-4 px-4 shadow-[0_20px_45px_rgba(0,0,0,0.65)] mdx:flex-row mdx:items-center mdx:gap-8">
+        <div className="flex w-full items-center justify-between mdx:w-auto mdx:flex-row mdx:items-center mdx:gap-4 mdx:justify-start">
           <Link className="btn btn-ghost normal-case text-xl text-rose-100" href="/">
             <Image alt="Logo" src="/logo.png" height={25} width={50} />
           </Link>
-          <ul className="menu menu-horizontal px-1 space-x-2 text-sm">
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm border border-white/10 text-rose-100 mdx:hidden"
+            aria-expanded={isMenuOpen}
+            aria-controls="primary-navigation"
+            onClick={() => setIsMenuOpen((prev) => !prev)}
+          >
+            {isMenuOpen ? "Close" : "Menu"}
+          </button>
+        </div>
+        <div
+          id="primary-navigation"
+          className={`w-full flex-col gap-4 ${isMenuOpen ? "flex" : "hidden"} mdx:flex mdx:flex-1 mdx:flex-row mdx:items-center mdx:gap-6`}
+        >
+          <ul className="flex w-full flex-col gap-2 text-sm text-rose-200/80 mdx:flex-1 mdx:flex-row mdx:flex-wrap mdx:items-center mdx:justify-start mdx:gap-3" aria-label="Primary">
             {links.map(({ label, path, accent, secondary, ghost }) => {
               const isActive = pathname.startsWith(path);
+              const responsiveSizing = "w-full justify-center mdx:w-auto";
               const defaultClasses = [
                 "inline-flex items-center px-3 py-2 rounded-xl font-medium transition-all duration-200",
                 "text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-400/80",
                 "active:scale-95",
+                responsiveSizing,
                 isActive
                   ? "bg-white/10 text-rose-50 shadow-inner shadow-black/40"
                   : "text-rose-200/80 hover:text-rose-50 hover:bg-white/5",
               ].join(" ");
               const accentClasses = [
-                "inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold tracking-wide",
+                "inline-flex items-center px-2.5 py-2 sm:px-4 rounded-full text-sm font-semibold tracking-wide",
                 "bg-gradient-to-r from-[#E23A1E] via-[#EF5C2F] to-[#B02117] text-white shadow-[0_15px_35px_rgba(226,58,30,0.4)]",
                 "transition-all duration-200 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EF5C2F]",
+                responsiveSizing,
                 isActive
                   ? "ring-2 ring-[#EF5C2F]/60 scale-105"
                   : "opacity-90 hover:opacity-100 hover:-translate-y-0.5",
@@ -57,6 +80,7 @@ export function UiLayout({
                 "inline-flex items-center px-3.5 py-2 rounded-full text-sm font-semibold transition-all duration-200",
                 "border border-[#EF5C2F]/60 text-[#EF5C2F] hover:text-white",
                 "bg-black/20 hover:bg-[#E23A1E]/20 shadow-[0_8px_20px_rgba(0,0,0,0.35)] active:scale-95",
+                responsiveSizing,
                 isActive ? "bg-[#E23A1E]/20 text-white border-[#EF5C2F]" : "",
                 "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EF5C2F]",
               ].join(" ");
@@ -64,11 +88,12 @@ export function UiLayout({
                 "inline-flex items-center px-3 py-2 rounded-full text-sm font-medium transition-all duration-200",
                 "text-rose-200/80 border border-white/15 hover:text-white hover:border-[#EF5C2F]/50",
                 "bg-white/5 hover:bg-white/10 active:scale-95 shadow-[0_6px_18px_rgba(0,0,0,0.35)]",
+                responsiveSizing,
                 isActive ? "text-white border-[#EF5C2F]/50" : "",
                 "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50",
               ].join(" ");
               return (
-                <li key={path}>
+                <li key={path} className="flex w-full mdx:w-auto">
                   <Link
                     className={
                       accent
@@ -87,10 +112,14 @@ export function UiLayout({
               );
             })}
           </ul>
-        </div>
-        <div className="flex-none space-x-2">
-          <WalletButton />
-          <ClusterUiSelect />
+          <div className="flex w-full flex-row flex-wrap gap-2 items-center justify-center mdx:w-auto mdx:flex-none mdx:flex-nowrap mdx:justify-end">
+            <div className="flex-shrink-0">
+              <WalletButton />
+            </div>
+            <div className="flex-shrink-0">
+              <ClusterUiSelect />
+            </div>
+          </div>
         </div>
       </div>
       <ClusterChecker>

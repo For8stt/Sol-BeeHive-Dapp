@@ -59,35 +59,41 @@ export function BeeHiveCreate() {
       <p className="text-sm text-gray-400">
         Each wallet can own up to three BeeHive accounts. Choose a slot (0-2) for the new PDA.
       </p>
-      <div className="flex gap-3 flex-wrap items-center">
-        <select
-          className="select select-bordered bg-black/40 border-[#E23A1E]/40 text-rose-50 focus:border-[#EF5C2F] focus:outline-none"
-          disabled={!wallet.connected}
-          value={selectedSlot ?? ""}
-          onChange={(e) => setSelectedSlot(Number(e.target.value))}
-        >
-          <option value="" disabled>
-            {wallet.connected ? "Select slot" : "Connect wallet"}
-          </option>
-          {wallet.publicKey &&
-            getAvailableSlots(wallet.publicKey).map((slot) => (
-              <option key={slot} value={slot}>
-                Slot {slot}
-              </option>
-            ))}
-        </select>
-        <input
-          type="text"
-          className="input input-bordered bg-black/40 border-[#E23A1E]/40 text-rose-50 placeholder:text-rose-200/60 focus:border-[#EF5C2F] focus:outline-none"
-          placeholder="BeeHive account name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          maxLength={32}
-          disabled={!wallet.connected}
-        />
-        <button className={beehiveButtonClass} onClick={handleCreate}>
-          Create BeeHive Account
-        </button>
+      <div className="flex w-full flex-col gap-3 sm:flex-col smx:flex-row smx:flex-nowrap">
+        <div className="w-full smx:max-w-xs mdx:max-w-none">
+          <select
+            className="select select-bordered w-full bg-black/40 border-[#E23A1E]/40 text-rose-50 focus:border-[#EF5C2F] focus:outline-none"
+            disabled={!wallet.connected}
+            value={selectedSlot ?? ""}
+            onChange={(e) => setSelectedSlot(Number(e.target.value))}
+          >
+            <option value="" disabled>
+              {wallet.connected ? "Select slot" : "Connect wallet"}
+            </option>
+            {wallet.publicKey &&
+              getAvailableSlots(wallet.publicKey).map((slot) => (
+                <option key={slot} value={slot}>
+                  Slot {slot}
+                </option>
+              ))}
+          </select>
+        </div>
+        <div className="w-full flex-1 min-w-[180px]">
+          <input
+            type="text"
+            className="input input-bordered w-full bg-black/40 border-[#E23A1E]/40 text-rose-50 placeholder:text-rose-200/60 focus:border-[#EF5C2F] focus:outline-none"
+            placeholder="BeeHive account name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            maxLength={32}
+            disabled={!wallet.connected}
+          />
+        </div>
+        <div className="w-full sm:w-auto smx:w-auto smx:flex-none smx:self-auto smx:flex smx:justify-center">
+          <button className={`${beehiveButtonClass} w-full sm:w-auto smx:w-auto smx:min-w-[200px]`} onClick={handleCreate}>
+            Create BeeHive Account
+          </button>
+        </div>
       </div>
       {wallet.publicKey && getOwnedAccounts(wallet.publicKey).length >= 3 && (
         <p className="text-red-500 text-sm">

@@ -7,7 +7,12 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      screens: {
+        smx: "680px",
+        mdx: "860px",
+      },
+    },
   },
   plugins: [require('daisyui')],
 };
